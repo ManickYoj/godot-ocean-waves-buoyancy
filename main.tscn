@@ -1,6 +1,6 @@
-[gd_scene load_steps=28 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=27 format=3 uid="uid://dx4r13gqfh13"]
 
-[ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://main.gd" id="1_skarq"]
+[ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://assets/scripts/main.gd" id="1_skarq"]
 [ext_resource type="Script" uid="uid://dddasf5sla0ws" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
 [ext_resource type="Script" uid="uid://4j6vkvpadkr7" path="res://assets/player/camera.gd" id="4_v2yip"]
@@ -12,8 +12,7 @@
 [ext_resource type="Shader" uid="uid://bjmoda33o8qkd" path="res://assets/shaders/spatial/sea_spray.gdshader" id="8_eu8jb"]
 [ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="9_skbf4"]
 [ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
-[ext_resource type="Script" uid="uid://duwivrcwksx0" path="res://flotation.gd" id="13_ycdy4"]
-[ext_resource type="Script" uid="uid://dns1hqa1s1kar" path="res://buoyancy_manager.gd" id="14_w48qg"]
+[ext_resource type="Script" uid="uid://dsn01qhv7ioi3" path="res://assets/scripts/buoyant_cell.gd" id="14_vivmo"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
 panorama = ExtResource("3_0ksgj")
@@ -106,10 +105,10 @@ height_falloff = 0.176
 edge_fade = 1.75
 
 [sub_resource type="BoxMesh" id="BoxMesh_dg77c"]
-size = Vector3(70, 15, 30)
+size = Vector3(64, 16, 32)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_dg77c"]
-size = Vector3(70, 15, 30)
+size = Vector3(32, 8, 16)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_skarq")
@@ -129,8 +128,8 @@ transform = Transform3D(0.0448224, -0.173473, 0.983818, -1.29872e-09, 0.984808, 
 far = 10000.0
 script = ExtResource("4_v2yip")
 
-[node name="Water" type="MeshInstance3D" parent="." node_paths=PackedStringArray("bouyancy_manager")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 0, 12)
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, 0, -42)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -142,7 +141,6 @@ water_color = Color(0.0392157, 0.192157, 0.180392, 1)
 foam_color = Color(0.898039, 0.854902, 0.8, 1)
 parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0"), SubResource("Resource_83u3u")])
 updates_per_second = 60.0
-bouyancy_manager = NodePath("../BouyancyManager")
 
 [node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
 transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0, 0)
@@ -167,26 +165,76 @@ stream = ExtResource("8_6r5si")
 volume_db = -30.0
 autoplay = true
 
-[node name="RigidBody3D" type="RigidBody3D" parent="." node_paths=PackedStringArray("buoyancy_manager", "mesh_inst")]
-transform = Transform3D(0.341216, 0, 0.939985, 0, 1, 0, -0.939985, 0, 0.341216, -35.9468, 6.67438, 0)
-mass = 200.0
-center_of_mass_mode = 1
-angular_damp = 3.0
-script = ExtResource("13_ycdy4")
-buoyancy_manager = NodePath("../BouyancyManager")
-buoyancy_spring = 600.0
-buoyancy_damping = 1.0
-buoyancy_max_force = 10000.0
-mesh_inst = NodePath("MeshInstance3D")
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(0.341216, 0, 0.939985, 0, 1, 0, -0.939985, 0, 0.341216, -35.9468, 0.68457, 0)
+mass = 1.6384e+07
+gravity_scale = 0.0
+linear_damp = 0.1
+angular_damp = 2.0
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.554785, 0)
+[node name="MeshInstance" type="MeshInstance3D" parent="RigidBody3D"]
 mesh = SubResource("BoxMesh_dg77c")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
-transform = Transform3D(1, 0, 1.78814e-07, 0, 1, 0, -1.78814e-07, 0, 1, 0, 0, 0)
+[node name="Cell_APD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, 4, 8)
 shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
 
-[node name="BouyancyManager" type="Node" parent="." node_paths=PackedStringArray("water")]
-script = ExtResource("14_w48qg")
-water = NodePath("../Water")
+[node name="Cell_ASD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, 4, -8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_FSD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, 4, -8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_FPD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, 4, 8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_APV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, -4, 8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_ASV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, -4, -8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_FSV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, -4, -8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
+
+[node name="Cell_FPV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, -4, 8)
+shape = SubResource("BoxShape3D_dg77c")
+script = ExtResource("14_vivmo")
+water = NodePath("../../Water")
+parent = NodePath("..")
+calc_f_gravity = true
