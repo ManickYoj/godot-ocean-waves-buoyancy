@@ -6,6 +6,9 @@ This fork aims to combining the best of the Godot ocean work from 2Retr0, krautd
 
 I've also implemented my own buoyancy simulation which takes in a mesh and samples the depth at all vertices, applying resultant forces at that vertex. Resultant forces include not just the buoyant force, but also hydrodynamic drag (that is, water resistance).
 
+https://github.com/user-attachments/assets/fe37fde5-51bf-4512-9cba-7e3bb36739da
+
+
 TODO:
 - [ ] Calculate the volume of the submerged object and use that to determine the resultant buoyant force, rather than approximating at vertices based on a constant, volume independent force as it does now
 - [ ] See if I can figure out the same thing krautdev and Luctatus22 were working on: reading displacement textures from the GPU more efficiently. Luctatus22's README has some ideas here
