@@ -130,7 +130,7 @@ far = 10000.0
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="." node_paths=PackedStringArray("bouyancy_manager")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 64, 0, 12)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 51, 0, 12)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -171,12 +171,11 @@ autoplay = true
 transform = Transform3D(0.341216, 0, 0.939985, 0, 1, 0, -0.939985, 0, 0.341216, -35.9468, 6.67438, 0)
 mass = 200.0
 center_of_mass_mode = 1
-center_of_mass = Vector3(0, -5, 0)
-angular_damp = 1.5
+angular_damp = 3.0
 script = ExtResource("13_ycdy4")
 buoyancy_manager = NodePath("../BouyancyManager")
 buoyancy_spring = 600.0
-buoyancy_damping = 1.5
+buoyancy_damping = 1.0
 buoyancy_max_force = 10000.0
 mesh_inst = NodePath("MeshInstance3D")
 
