@@ -1,13 +1,31 @@
-extends CollisionShape3D
+extends MeshInstance3D
 
 @export var water : Node
 @export var parent : RigidBody3D
 @export var cell_density_kg_per_m3: float = 500; # 500 is about right for solid wood, though 300-900 are acceptable ranges
-@export var fluid_density_kg_per_m3: float = 1000; # Thanks, science
 @export var calc_f_gravity: bool = false; # True if this should simulate gravity on this cell. 0 if gravity is calculated on the whole rigidbody
+@export var engine_force: float = 0; # If not 0 provides thrust of the amount given at this cell in the local X direction
+@export var debug_log: bool = false; # True if this should simulate gravity on this cell. 0 if gravity is calculated on the whole rigidbody
+@export var active: bool = true; # If false, does nothing
+
+var fluid_density_kg_per_m3: float = 1000; # Thanks, science
+
+#var indicator: MeshInstance3D;
+#var indicator_mesh: BoxMesh;
 
 func _physics_process(delta: float) -> void:
-	apply_force_on_cell()
+	#if !active:
+		#return
+
+	apply_force_on_cell(delta)
+
+	if engine_force > 0:
+		apply_engine_force_on_cell(delta)
+	
+func apply_engine_force_on_cell(delta: float) -> void:
+	print("firing engine")
+	parent.apply_force(Vector3(engine_force, 0, 0), global_position)
+	
 
 # Divides the cell 1 time, into 8 cells.
 # Then, simulates buoyant force acting on each cell. Returns an array where
@@ -17,17 +35,22 @@ func _physics_process(delta: float) -> void:
 # Eg. with only one cell [(-.5, 2, 0.3), (0, 10, 0)]: the first Vector3 is the
 # global position of the point, and the second Vector3 is a +10N buoyant force
 # acting in the global Y direction
-#func force_on_octets(global_position: Vector3, size: Vector3, cell_density_kg_per_m3: float = 100) -> PackedVector3Array:
-	#var elements = PackedVector3Array()
-	#elements.resize(8 * 2) # Cells * 2 Vector3s per cell
+func apply_force_on_octets(size: Vector3, cell_density_kg_per_m3: float = 100) -> void:
+	var elements = PackedVector3Array()
+	elements.resize(8 * 2) # Cells * 2 Vector3s per cell
+	pass
 	#for x in range(2):
 		#for y in range(2):
 			#for z in range(2):
-				 ##Need to rotate size to match
-				##var center = Vector3(global_position - x)
-				##var offset = Vector3(x - 0.5, y - 0.5, z - 0.5) + (0.5 * size);
-				##force_on_cell(global_position = global_position - : size / 2)
-	#return elements
+				# Need to rotate size to match
+				#var center = Vector3(global_position - x)
+				#var offset = Vector3(x - 0.5, y - 0.5, z - 0.5) + (0.5 * size);
+				#force_on_cell(global_position = global_position - : size / 2)
+	
+func mass() -> float:
+	var size = mesh.size
+	var volume: float = size.x * size.y * size.z
+	return cell_density_kg_per_m3 * volume
 
 # This approach uses a box shape to model the main 'void' area of a ship or
 # some subsection of it. It divides the box into octets and samples the depth
@@ -40,35 +63,58 @@ func _physics_process(delta: float) -> void:
 # feel their weight correctly. Uneven weights will distribute correctly and you
 # could even simulate sinking as some boxes gain weight equal to or greater than
 # the volume of water they displace
-func apply_force_on_cell() -> void:
-	var size = shape.size;
+func apply_force_on_cell(delta: float) -> void:
+	var size = mesh.size
 	var volume: float = size.x * size.y * size.z
-	var global_position = to_global(position)
 	var depth: float = water.get_wave_height(global_position) - global_position.y
 	
-	# To tell how much of the box is submerged, we reimagine the volume as containing
-	# to a cube, then assume that the depth of the center as a fraction of the
-	# cube height is equivalent the fraction of the volume that is submerged.
-	
-	# TODO: account for effects of only being partially submerged
 	var gravity = ProjectSettings.get_setting("physics/3d/default_gravity_vector") * ProjectSettings.get_setting("physics/3d/default_gravity")
-	var cube_side_length = pow(volume, 1.0/3.0)
-	var submerged_fraction = clampf((depth + 0.5 * cube_side_length) / cube_side_length, 0, 1)
+	#var cube_side_length = pow(volume, 1.0/3.0)
+	#draw_gizmo(Vector3(cube_side_length, cube_side_length, cube_side_length))
+	
+	var submerged_fraction = clampf((depth + 0.5 * size.y) / size.y, 0, 1)
 	#print(submerged_fraction)
 	
 	var displaced_mass = fluid_density_kg_per_m3 * volume * submerged_fraction
 	var f_buoyancy: Vector3 = displaced_mass * -gravity
 	var f_gravity = Vector3.ZERO
 	if calc_f_gravity:
-		f_gravity = cell_density_kg_per_m3 * volume * gravity;
-	print("------")
-	print("Gravity: " + str(f_gravity))
-	print("Buoyancy: " + str(f_buoyancy))
-	print("Depth at center: " + str(depth))
-	print("Submerged fraction: " + str(submerged_fraction))
-	print("Position: " + str(position))
-	
-	parent.apply_force(f_buoyancy + f_gravity, position)
+		f_gravity = mass() * gravity;
+		
+		
+	var net_force = f_buoyancy + f_gravity
+	# Global axis, 
+	var force_location = global_position - parent.global_position
+		
+	if debug_log:
+		print("------ Buoyancy Cell: " + name + " ------")
+		print("Cell Height: " + str(size.y))
+		print("Gravity: " + str(f_gravity))
+		print("Buoyancy: " + str(f_buoyancy))
+		print("Net Force: " + str(net_force))
+		print("Global Net Force: " + str(to_global(net_force)))
+		print("Depth at center: " + str(depth))
+		print("Submerged fraction: " + str(submerged_fraction))
+		print("Local Position: " + str(position))
+		print("Global Position: " + str(global_position))
+		print("Parent Global Pos: " + str(parent.global_position))
+		print("Vector to Force: " + str(force_location))
+		print("Global Vector to Force: " + str(to_global(force_location)))
+		#print("Mass: " + str(parent.mass))
+		#print("Inertia: " + str(parent.inertia))
+		
+	# NOTES:
+	# var global_velocity: Vector3
+	# var local_velocity = global_basis.inverse() * global_velocity
+	# var local_velocity: Vector3
+	# var global_velocity = global_basis * local_velocity
+	if active:
+		# force is on the GLOBAL axis. Good for gravity & buoyancy, hard for engines
+		# position IS on the GLOBAL axis from the center, but magnitudes are local distances
+		# to the center of mass. Why? Who tf knows
+		# Force should be framerate independent, but it doesn't appear to be
+		parent.apply_force(net_force, force_location)
+		#parent.apply_force(Vector3(0, -10000000, 0), Vector3(0, 0, -10))
 	
 	
 	#return f_gravity #+ f_buoyancy
@@ -81,4 +127,11 @@ func apply_force_on_cell() -> void:
 	
 	
 	
-	pass
+#func draw_gizmo(size: Vector3):
+	#if indicator == null:
+		#indicator = MeshInstance3D.new()
+		#add_child(indicator)
+		#indicator.name = "(EditorOnly) Visual indicator"
+		#indicator_mesh = BoxMesh.new()
+	#indicator_mesh.size = size
+		

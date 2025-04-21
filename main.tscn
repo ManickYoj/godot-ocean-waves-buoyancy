@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=33 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://assets/scripts/main.gd" id="1_skarq"]
 [ext_resource type="Script" uid="uid://dddasf5sla0ws" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
@@ -12,7 +12,9 @@
 [ext_resource type="Shader" uid="uid://bjmoda33o8qkd" path="res://assets/shaders/spatial/sea_spray.gdshader" id="8_eu8jb"]
 [ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="9_skbf4"]
 [ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
+[ext_resource type="PackedScene" uid="uid://f66806hbo71b" path="res://assets/models/ss_norrtelje_1900.glb" id="14_2cqfq"]
 [ext_resource type="Script" uid="uid://dsn01qhv7ioi3" path="res://assets/scripts/buoyant_cell.gd" id="14_vivmo"]
+[ext_resource type="Script" uid="uid://kwfe6bfkiqn2" path="res://mass_calculation.gd" id="14_yaehf"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
 panorama = ExtResource("3_0ksgj")
@@ -46,14 +48,14 @@ script = ExtResource("2_pw5n6")
 tile_length = Vector2(128, 128)
 displacement_scale = 1.0
 normal_scale = 1.0
-wind_speed = 10.0
+wind_speed = 2.5
 wind_direction = 20.0
-fetch_length = 600.0
+fetch_length = 50.0
 swell = 0.8
 spread = 0.5
 detail = 1.0
 whitecap = 0.5
-foam_amount = 6.0
+foam_amount = 5.0
 
 [sub_resource type="Resource" id="Resource_luhq0"]
 script = ExtResource("2_pw5n6")
@@ -104,11 +106,24 @@ albedo = Color(0.988718, 0.989631, 0.989629, 1)
 height_falloff = 0.176
 edge_fade = 1.75
 
-[sub_resource type="BoxMesh" id="BoxMesh_dg77c"]
-size = Vector3(64, 16, 32)
+[sub_resource type="BoxShape3D" id="BoxShape3D_82xsv"]
+size = Vector3(44, 8, 8.67642)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_dg77c"]
-size = Vector3(32, 8, 16)
+[sub_resource type="BoxMesh" id="BoxMesh_2cqfq"]
+size = Vector3(12, 4, 3.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vivmo"]
+resource_local_to_scene = true
+size = Vector3(12, 4, 3.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yaehf"]
+size = Vector3(16, 4, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_074og"]
+size = Vector3(16, 4, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_cegan"]
+size = Vector3(10, 2, 2)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_skarq")
@@ -129,7 +144,7 @@ far = 10000.0
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, 0, -42)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 0, 63)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -165,76 +180,107 @@ stream = ExtResource("8_6r5si")
 volume_db = -30.0
 autoplay = true
 
-[node name="RigidBody3D" type="RigidBody3D" parent="."]
-transform = Transform3D(0.341216, 0, 0.939985, 0, 1, 0, -0.939985, 0, 0.341216, -35.9468, 0.68457, 0)
-mass = 1.6384e+07
+[node name="Ferry Simplified Experiment" type="RigidBody3D" parent="." node_paths=PackedStringArray("buoyant_cells")]
+transform = Transform3D(-0.380425, -1.30385e-08, -0.924812, -1.71796e-08, 1, -1.12748e-07, 0.924812, 1.19209e-07, -0.380425, -28.8633, 5, 23.0688)
+mass = 1.04378e+06
 gravity_scale = 0.0
-linear_damp = 0.1
-angular_damp = 2.0
+center_of_mass_mode = 1
+inertia = Vector3(9.4394e+07, 1.29109e+07, 587128)
+angular_damp = 0.05
+script = ExtResource("14_yaehf")
+debug = true
+buoyant_cells = [NodePath("AS Cell"), NodePath("FS Cell"), NodePath("MS Cell"), NodePath("MP Cell"), NodePath("FP Cell"), NodePath("AP Cell"), NodePath("Aft Ballast"), NodePath("Fore Ballast")]
 
-[node name="MeshInstance" type="MeshInstance3D" parent="RigidBody3D"]
-mesh = SubResource("BoxMesh_dg77c")
+[node name="Collider" type="CollisionShape3D" parent="Ferry Simplified Experiment"]
+transform = Transform3D(0.999998, 0, 2.57045e-07, 0, 0.999998, 0, -2.04891e-07, 0, 0.999998, -0.972511, -3.7498, 3.8147e-06)
+shape = SubResource("BoxShape3D_82xsv")
+debug_color = Color(0.761639, 0.449833, 0.105389, 1)
 
-[node name="Cell_APD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, 4, 8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="Ferry" parent="Ferry Simplified Experiment" instance=ExtResource("14_2cqfq")]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -1, 2, 0)
+
+[node name="FS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, -2)
+visible = false
+mesh = SubResource("BoxMesh_2cqfq")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
+debug_log = true
 
-[node name="Cell_ASD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, 4, -8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="FP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, 2)
+visible = false
+mesh = SubResource("BoxMesh_vivmo")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
+debug_log = true
 
-[node name="Cell_FSD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, 4, -8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="MS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -3)
+visible = false
+mesh = SubResource("BoxMesh_yaehf")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
 
-[node name="Cell_FPD" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, 4, 8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="MP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 3)
+visible = false
+mesh = SubResource("BoxMesh_074og")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
+debug_log = true
 
-[node name="Cell_APV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, -4, 8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="AS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -3.75, -2)
+visible = false
+mesh = SubResource("BoxMesh_vivmo")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
 
-[node name="Cell_ASV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, 16, -4, -8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="AP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -3.75, 2)
+visible = false
+mesh = SubResource("BoxMesh_2cqfq")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
+debug_log = true
 
-[node name="Cell_FSV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, -4, -8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="Aft Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.58, -7, 0)
+visible = false
+mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 700.0
 calc_f_gravity = true
+debug_log = true
 
-[node name="Cell_FPV" type="CollisionShape3D" parent="RigidBody3D" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 2.38419e-07, 0, 1, 0, -2.38419e-07, 0, 1, -16, -4, 8)
-shape = SubResource("BoxShape3D_dg77c")
+[node name="Fore Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.58, -7, 0)
+visible = false
+mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
+cell_density_kg_per_m3 = 700.0
 calc_f_gravity = true
+debug_log = true
