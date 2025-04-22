@@ -9,7 +9,7 @@ In addition, I've improved on the Lucatatus22 solution for buoyancy. Luctatus22'
 This solution is robust and flexible: by fitting cells to an arbitrary model (eg. a ship), the water will provide forces appropriate to its shape. Moreover, the variable densities of the cells let you simulate some pretty cool things. You can add ballast to a ship to keep it upright without relying on eg. angle locking. Moreover, you can accurately simulate a ship sinking by altering the density of some of the buoyant cells as they take on water.
 
 ## TIPS for using
- - More (minimally overlapping) cells will also give more accurate results. I'd suggest 4 cells minimum aligned on the XZ plane: if the cells are all stacked on the same X or Z axis, your floating body will have all forces applied to the center and won't roll with the waves as well. If your boat has a narrow axis (most do have one), setting the boxes a bit outside the nominal 'sides' of the ship will help it simulate rolling with the waves better.
+ - Several cells will give more accurate results. I'd suggest 4 cells minimum aligned on the XZ plane: if the cells are all stacked on the same X or Z axis, your floating body will have all forces applied to the center and won't roll with the waves as well. If your boat has a narrow axis (most do have one), setting the boxes a bit outside the nominal 'sides' of the ship will help it simulate rolling with the waves better. I set up my boat for the demo with 8 cells. 6 in a very narrow 'hexagon' for the main body of the boat to simulate the parts that float well and 2 ballast cells fore and aft to help right the boat and keep it from getting too 'floaty'
  - For the most accurate physical simulation, make sure the parent rigidbody mass matches the constituent box cell volumes * densities. OR better yet, add all the cells to the mass_calcualtion script on the parent rigidbody: that will cause the parent to automatically calculate it's mass and a reasonable moment of inertia based on the cells.
  - Turn off gravity on the rigidbody by setting the gravity scale to 0 and let the cells calculate gravity for you
  - Because I messed up an axis on the model I'm using, the engine thrust, if you use it, is inverted. Sorry ¯\_(ツ)_/¯
@@ -20,8 +20,12 @@ https://github.com/user-attachments/assets/fe37fde5-51bf-4512-9cba-7e3bb36739da
 
 ### TODO:
 - [x] Calculate the volume of the submerged object and use that to determine the resultant buoyant force, rather than approximating at vertices based on a constant, volume independent force as it does now
-- [x] Automatically sum the weights of buoyancy cells to the rigidbody to save manual config. Consider using something other than colliders to better preserve performance.
+- [x] Automatically sum the weights of buoyancy cells to the rigidbody to save manual config. Consider using something other than colliders to better preserve performance
+- [ ] Fix engine thrust to be the correct direction and fix the ferry model to face the right way while I'm at it
+- [ ] Add an option to automatically subdivide one big cell into quadrants or octets to minimize the amount of manual cell creation needed to set up a boat
+- [ ] Make a $1CK demo of a ship taking damage and starting to list and sink
 - [ ] Simulate hydrodynamic drag as a way to resist linear and angular forces as a function of area and , rather than Godot's physically inaccurate damping on rigidbodies
+- [ ] Keep the water out of boats, perhaps. Water washing over the boats is a little cool, but water welling up within a boat or disappearing to nothing is less cool. Luctatus22's README has some ideas here
 - [ ] See if I can figure out the same thing krautdev and Luctatus22 were working on: reading displacement textures from the GPU more efficiently. Luctatus22's README has some ideas here
 - [ ] Add some nice VFX for wakes and splashes when a hull slaps down on water
-- [ ] Keeping the water out of boats, perhaps. Water washing over the boats is a little cool, but water welling up within a boat or disappearing to nothing is less cool. Luctatus22's README has some ideas here
+
