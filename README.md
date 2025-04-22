@@ -16,9 +16,11 @@ This solution is robust and flexible: by fitting cells to an arbitrary model (eg
 
 
 https://github.com/user-attachments/assets/fe37fde5-51bf-4512-9cba-7e3bb36739da
+
 Above: A box floating with an octet of equal sized, equal density cells
 
 https://github.com/user-attachments/assets/3068c10b-b781-465f-a093-fd14d6cd6dd0
+
 Above: Had some fun with shaders too. Boat is a hex of floation cells with a fore and aft ballast cell underneath
 
 ### TODO:
