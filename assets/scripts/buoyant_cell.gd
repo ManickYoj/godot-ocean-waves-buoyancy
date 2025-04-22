@@ -14,8 +14,8 @@ var fluid_density_kg_per_m3: float = 1000; # Thanks, science
 #var indicator_mesh: BoxMesh;
 
 func _physics_process(delta: float) -> void:
-	#if !active:
-		#return
+	if !active:
+		return
 
 	apply_force_on_cell(delta)
 
@@ -24,7 +24,7 @@ func _physics_process(delta: float) -> void:
 	
 func apply_engine_force_on_cell(delta: float) -> void:
 	print("firing engine")
-	parent.apply_force(Vector3(engine_force, 0, 0), global_position)
+	parent.apply_force( to_global(Vector3(-engine_force, 0, 0)), global_position - parent.global_position)
 	
 
 # Divides the cell 1 time, into 8 cells.

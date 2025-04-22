@@ -48,14 +48,14 @@ script = ExtResource("2_pw5n6")
 tile_length = Vector2(128, 128)
 displacement_scale = 1.0
 normal_scale = 1.0
-wind_speed = 2.5
-wind_direction = 20.0
-fetch_length = 50.0
+wind_speed = 20.0
+wind_direction = 15.0
+fetch_length = 4.0
 swell = 0.8
 spread = 0.5
 detail = 1.0
-whitecap = 0.5
-foam_amount = 5.0
+whitecap = 0.4
+foam_amount = 0.77
 
 [sub_resource type="Resource" id="Resource_luhq0"]
 script = ExtResource("2_pw5n6")
@@ -64,8 +64,8 @@ displacement_scale = 0.75
 normal_scale = 1.0
 wind_speed = 5.0
 wind_direction = 15.0
-fetch_length = 150.0
-swell = 0.8
+fetch_length = 50.0
+swell = 0.6
 spread = 0.4
 detail = 1.0
 whitecap = 0.5
@@ -139,12 +139,12 @@ shadow_opacity = 0.8
 shadow_blur = 5.0
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(0.0448224, -0.173473, 0.983818, -1.29872e-09, 0.984808, 0.173648, -0.998995, -0.00778332, 0.0441415, 29.1839, 21.2822, 13.206)
+transform = Transform3D(0.998719, 0, 0.0505929, 0, 1, 0, -0.0505929, 0, 0.998719, -3.74758, 12.3556, 81.9562)
 far = 10000.0
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 0, 63)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 0, 99)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -181,11 +181,12 @@ volume_db = -30.0
 autoplay = true
 
 [node name="Ferry Simplified Experiment" type="RigidBody3D" parent="." node_paths=PackedStringArray("buoyant_cells")]
-transform = Transform3D(-0.380425, -1.30385e-08, -0.924812, -1.71796e-08, 1, -1.12748e-07, 0.924812, 1.19209e-07, -0.380425, -28.8633, 5, 23.0688)
+transform = Transform3D(-0.994964, -1.30385e-08, -0.10024, 7.31041e-08, 1, -2.87383e-08, 0.10024, 1.19209e-07, -0.994964, -79.8999, 5, 9.36186)
 mass = 1.04378e+06
 gravity_scale = 0.0
 center_of_mass_mode = 1
 inertia = Vector3(9.4394e+07, 1.29109e+07, 587128)
+linear_damp = 0.05
 angular_damp = 0.05
 script = ExtResource("14_yaehf")
 debug = true
@@ -200,7 +201,7 @@ debug_color = Color(0.761639, 0.449833, 0.105389, 1)
 transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, -1, 2, 0)
 
 [node name="FS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, -3)
 visible = false
 mesh = SubResource("BoxMesh_2cqfq")
 script = ExtResource("14_vivmo")
@@ -211,7 +212,7 @@ calc_f_gravity = true
 debug_log = true
 
 [node name="FP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, 3)
 visible = false
 mesh = SubResource("BoxMesh_vivmo")
 script = ExtResource("14_vivmo")
@@ -270,8 +271,9 @@ mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
-cell_density_kg_per_m3 = 700.0
+cell_density_kg_per_m3 = 1500.0
 calc_f_gravity = true
+engine_force = 100000.0
 debug_log = true
 
 [node name="Fore Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
@@ -281,6 +283,6 @@ mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
-cell_density_kg_per_m3 = 700.0
+cell_density_kg_per_m3 = 1000.0
 calc_f_gravity = true
 debug_log = true
