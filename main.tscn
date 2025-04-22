@@ -1,11 +1,13 @@
-[gd_scene load_steps=33 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=41 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://assets/scripts/main.gd" id="1_skarq"]
 [ext_resource type="Script" uid="uid://dddasf5sla0ws" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
+[ext_resource type="Shader" uid="uid://bej4anyo20ay" path="res://assets/shaders/spatial/color-reducer.gdshader" id="4_074og"]
 [ext_resource type="Script" uid="uid://4j6vkvpadkr7" path="res://assets/player/camera.gd" id="4_v2yip"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="5_lt75t"]
 [ext_resource type="ArrayMesh" uid="uid://qexqjidelskc" path="res://assets/water/clipmap_high_8k.obj" id="5_w48qg"]
+[ext_resource type="Script" uid="uid://chp0830l0pg38" path="res://assets/scripts/screen_space_shader.gd" id="5_yaehf"]
 [ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
 [ext_resource type="Script" uid="uid://bdjbwk3saoju4" path="res://assets/water/water.gd" id="7_s0x5e"]
 [ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
@@ -14,7 +16,9 @@
 [ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
 [ext_resource type="PackedScene" uid="uid://f66806hbo71b" path="res://assets/models/ss_norrtelje_1900.glb" id="14_2cqfq"]
 [ext_resource type="Script" uid="uid://dsn01qhv7ioi3" path="res://assets/scripts/buoyant_cell.gd" id="14_vivmo"]
-[ext_resource type="Script" uid="uid://kwfe6bfkiqn2" path="res://mass_calculation.gd" id="14_yaehf"]
+[ext_resource type="Script" uid="uid://kwfe6bfkiqn2" path="res://assets/scripts/mass_calculation.gd" id="14_yaehf"]
+[ext_resource type="Shader" uid="uid://di3q3um10ga2l" path="res://assets/shaders/canvas/tilt-shift-canvas.gdshader" id="18_074og"]
+[ext_resource type="Shader" uid="uid://dv5wh3dpbsgny" path="res://assets/shaders/canvas/mono-halftone.gdshader" id="19_cegan"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
 panorama = ExtResource("3_0ksgj")
@@ -43,6 +47,19 @@ adjustment_brightness = 0.85
 adjustment_contrast = 1.07
 adjustment_saturation = 1.5
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_074og"]
+render_priority = 0
+shader = ExtResource("4_074og")
+shader_parameter/colorCount = Vector3(12, 12, 12)
+shader_parameter/colorShift = Vector3(1, 2, 1)
+shader_parameter/doShiftFirst = false
+shader_parameter/includeAlpha = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_2cqfq"]
+material = SubResource("ShaderMaterial_074og")
+flip_faces = true
+size = Vector2(2, 2)
+
 [sub_resource type="Resource" id="Resource_adqv5"]
 script = ExtResource("2_pw5n6")
 tile_length = Vector2(128, 128)
@@ -50,9 +67,9 @@ displacement_scale = 1.0
 normal_scale = 1.0
 wind_speed = 20.0
 wind_direction = 15.0
-fetch_length = 4.0
-swell = 0.8
-spread = 0.5
+fetch_length = 2.0
+swell = 0.7
+spread = 0.55
 detail = 1.0
 whitecap = 0.4
 foam_amount = 0.77
@@ -125,6 +142,22 @@ size = Vector3(16, 4, 4)
 [sub_resource type="BoxMesh" id="BoxMesh_cegan"]
 size = Vector3(10, 2, 2)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cegan"]
+resource_local_to_scene = true
+shader = ExtResource("18_074og")
+shader_parameter/limit = 0.4
+shader_parameter/blur = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_82xsv"]
+resource_local_to_scene = true
+shader = ExtResource("19_cegan")
+shader_parameter/max_dots = 800
+shader_parameter/dot_size = 0.7
+shader_parameter/brightness_mult = 1.0
+shader_parameter/invert = false
+shader_parameter/primary_color = Color(0.1, 0.1, 0.2, 1)
+shader_parameter/secondary_color = Color(0.9, 0.9, 0.8, 1)
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_skarq")
 
@@ -139,12 +172,21 @@ shadow_opacity = 0.8
 shadow_blur = 5.0
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(0.998719, 0, 0.0505929, 0, 1, 0, -0.0505929, 0, 0.998719, -3.74758, 12.3556, 81.9562)
+transform = Transform3D(0.998719, -0.00536568, 0.0503076, 9.3013e-10, 0.99436, 0.106056, -0.0505929, -0.10592, 0.993087, -52.1684, 14.6261, 56.0741)
 far = 10000.0
 script = ExtResource("4_v2yip")
 
+[node name="Screen-Space Spatial Shader" type="MeshInstance3D" parent="Camera" node_paths=PackedStringArray("target")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+visible = false
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_2cqfq")
+skeleton = NodePath("../..")
+script = ExtResource("5_yaehf")
+target = NodePath("../../Ferry Simplified Experiment")
+
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 70, 0, 99)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 85)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -186,8 +228,8 @@ mass = 1.04378e+06
 gravity_scale = 0.0
 center_of_mass_mode = 1
 inertia = Vector3(9.4394e+07, 1.29109e+07, 587128)
-linear_damp = 0.05
-angular_damp = 0.05
+linear_damp = 0.2
+angular_damp = 0.5
 script = ExtResource("14_yaehf")
 debug = true
 buoyant_cells = [NodePath("AS Cell"), NodePath("FS Cell"), NodePath("MS Cell"), NodePath("MP Cell"), NodePath("FP Cell"), NodePath("AP Cell"), NodePath("Aft Ballast"), NodePath("Fore Ballast")]
@@ -209,7 +251,6 @@ water = NodePath("../../Water")
 parent = NodePath("..")
 cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
-debug_log = true
 
 [node name="FP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, -4, 3)
@@ -220,7 +261,6 @@ water = NodePath("../../Water")
 parent = NodePath("..")
 cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
-debug_log = true
 
 [node name="MS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, -3)
@@ -241,7 +281,6 @@ water = NodePath("../../Water")
 parent = NodePath("..")
 cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
-debug_log = true
 
 [node name="AS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, -3.75, -2)
@@ -262,7 +301,6 @@ water = NodePath("../../Water")
 parent = NodePath("..")
 cell_density_kg_per_m3 = 100.0
 calc_f_gravity = true
-debug_log = true
 
 [node name="Aft Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.58, -7, 0)
@@ -273,8 +311,7 @@ water = NodePath("../../Water")
 parent = NodePath("..")
 cell_density_kg_per_m3 = 1500.0
 calc_f_gravity = true
-engine_force = 100000.0
-debug_log = true
+engine_force = 200000.0
 
 [node name="Fore Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.58, -7, 0)
@@ -283,6 +320,29 @@ mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
-cell_density_kg_per_m3 = 1000.0
+cell_density_kg_per_m3 = 1100.0
 calc_f_gravity = true
-debug_log = true
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Control"]
+
+[node name="Screen-Space Canvas Shader - Tilt Shift" type="ColorRect" parent="Control/CanvasLayer"]
+material = SubResource("ShaderMaterial_cegan")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Screen-Space Canvas Shader - Halftone" type="ColorRect" parent="Control/CanvasLayer"]
+material = SubResource("ShaderMaterial_82xsv")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

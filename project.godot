@@ -39,7 +39,7 @@ window/show_image=false
 [editor]
 
 movie_writer/mjpeg_quality=1.0
-movie_writer/movie_file="C:/Users/Nick/Documents/personal/projects/ocean-waves/clips/buoyancy_cells_and_ferry_01.avi"
+movie_writer/movie_file="C:/Users/Nick/Documents/personal/projects/ocean-waves/clips/ferry_halftone.avi"
 
 [editor_plugins]
 
