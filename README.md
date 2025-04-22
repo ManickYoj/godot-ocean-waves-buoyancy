@@ -9,14 +9,17 @@ In addition, I've improved on the Lucatatus22 solution for buoyancy. Luctatus22'
 This solution is robust and flexible: by fitting cells to an arbitrary model (eg. a ship), the water will provide forces appropriate to its shape. Moreover, the variable densities of the cells let you simulate some pretty cool things. You can add ballast to a ship to keep it upright without relying on eg. angle locking. Moreover, you can accurately simulate a ship sinking by altering the density of some of the buoyant cells as they take on water.
 
 ## TIPS for using
- - Several cells will give more accurate results. I'd suggest 4 cells minimum aligned on the XZ plane: if the cells are all stacked on the same X or Z axis, your floating body will have all forces applied to the center and won't roll with the waves as well. If your boat has a narrow axis (most do have one), setting the boxes a bit outside the nominal 'sides' of the ship will help it simulate rolling with the waves better. I set up my boat for the demo with 8 cells. 6 in a very narrow 'hexagon' for the main body of the boat to simulate the parts that float well and 2 ballast cells fore and aft to help right the boat and keep it from getting too 'floaty'
- - For the most accurate physical simulation, make sure the parent rigidbody mass matches the constituent box cell volumes * densities. OR better yet, add all the cells to the mass_calcualtion script on the parent rigidbody: that will cause the parent to automatically calculate it's mass and a reasonable moment of inertia based on the cells.
- - Turn off gravity on the rigidbody by setting the gravity scale to 0 and let the cells calculate gravity for you
- - Because I messed up an axis on the model I'm using, the engine thrust, if you use it, is inverted. Sorry ¯\_(ツ)_/¯
- - The buoyancy simulation doesn't yet account for drag (which helps prevent inaccurate rolling etc). I've found good results with an angular damp on rigidbodies of 0.5 and linear damp of about 0.1
+ - **Cell geometry:** Several cells will give more accurate results. I'd suggest 4 cells minimum aligned on the XZ plane: if the cells are all stacked on the same X or Z axis, your floating body will have all forces applied to the center and won't roll with the waves as well. If your boat has a narrow axis (most do have one), setting the boxes a bit outside the nominal 'sides' of the ship will help it simulate rolling with the waves better. I set up my boat for the demo with 8 cells. 6 in a very narrow 'hexagon' for the main body of the boat to simulate the parts that float well and 2 ballast cells fore and aft to help right the boat and keep it from getting too 'floaty'
+ - **Rigidbody physics:** For an accurate physical simulation, let the code do the work of setting the rigidbody's mass and moments of inertia by adding all the cells to the cells array of the mass_calcultion script on the parent rigidbody. Turn off gravity on the rigidbody by setting the gravity scale to 0 and let the cells calculate gravity for you. Lastly, the simulation doesn't yet account for drag (which helps prevent inaccurate rolling etc). I've found good results with an angular damp on rigidbodies of 0.5 and linear damp of about 0.1. Play around and find what feels right to you
+ - **Setting cell density:** For cells that should float, start around 100-300 kg/m^2. Water is 1000 kg/m^2, air is ~1.5 kg/m^2, solid wood is ~400-700 kg/m^2, solid steel is 7000 kg/m^2. A cell matching the weight of water would be neutrally buoyant, with just enough force to fully immerse itself. I'd suggest ballast should be about 1000-1200 kg/m^2
+ - Because I messed up an axis on the model I'm using, the engine thrust, if you use it, is inverted. Sorry ¯\_(ツ)_/¯ Will fix at some point
+
 
 https://github.com/user-attachments/assets/fe37fde5-51bf-4512-9cba-7e3bb36739da
+Above: A box floating with an octet of equal sized, equal density cells
 
+https://github.com/user-attachments/assets/3068c10b-b781-465f-a093-fd14d6cd6dd0
+Above: Had some fun with shaders too. Boat is a hex of floation cells with a fore and aft ballast cell underneath
 
 ### TODO:
 - [x] Calculate the volume of the submerged object and use that to determine the resultant buoyant force, rather than approximating at vertices based on a constant, volume independent force as it does now
