@@ -8,9 +8,16 @@ extends Camera3D
 @export var max_speed : float = 1000
 @export var min_speed : float = 0.2
 
+@export var target : Node3D
+@export var smoothing : float = 0.9
+
 @onready var _velocity = default_velocity
 
 var enable_camera_movement := true
+
+func _ready() -> void:
+	if (target):
+		look_at(target.global_position)
 
 func _input(event):
 	if not current or not enable_camera_movement:
@@ -34,6 +41,9 @@ func _input(event):
 func _process(delta):
 	if not current:
 		return
+	
+	if target:
+		transform.basis = lerp(transform.basis, look_at_vector(global_position, target.global_position), 1-smoothing)
 
 	var direction = Vector3(
 		float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)),
@@ -45,3 +55,10 @@ func _process(delta):
 		translate(direction * _velocity * delta * boost_speed_multiplier)
 	else:
 		translate(direction * _velocity * delta)
+		
+func look_at_vector(from: Vector3, to: Vector3, up: Vector3 = Vector3.UP) -> Basis :
+	var basis: Basis
+	basis.z = (from-to).normalized()
+	basis.x = up.cross(basis.z).normalized()
+	basis.y = basis.z.cross(basis.x).normalized()
+	return basis

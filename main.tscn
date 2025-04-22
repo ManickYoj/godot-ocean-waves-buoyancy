@@ -145,8 +145,8 @@ size = Vector3(10, 2, 2)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cegan"]
 resource_local_to_scene = true
 shader = ExtResource("18_074og")
-shader_parameter/limit = 0.4
-shader_parameter/blur = 2.0
+shader_parameter/limit = 0.3
+shader_parameter/blur = 3.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_82xsv"]
 resource_local_to_scene = true
@@ -171,10 +171,13 @@ shadow_normal_bias = 6.464
 shadow_opacity = 0.8
 shadow_blur = 5.0
 
-[node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(0.998719, -0.00536568, 0.0503076, 9.3013e-10, 0.99436, 0.106056, -0.0505929, -0.10592, 0.993087, -52.1684, 14.6261, 56.0741)
+[node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("target")]
+transform = Transform3D(0.998719, -0.00536568, 0.0503076, 9.3013e-10, 0.99436, 0.106056, -0.0505929, -0.10592, 0.993087, -51.615, 15.7927, 66.998)
+fov = 30.0
 far = 10000.0
 script = ExtResource("4_v2yip")
+target = NodePath("../Ferry Simplified Experiment/Camera focus")
+smoothing = 0.95
 
 [node name="Screen-Space Spatial Shader" type="MeshInstance3D" parent="Camera" node_paths=PackedStringArray("target")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
@@ -186,7 +189,7 @@ script = ExtResource("5_yaehf")
 target = NodePath("../../Ferry Simplified Experiment")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 85)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0, 126)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -223,7 +226,7 @@ volume_db = -30.0
 autoplay = true
 
 [node name="Ferry Simplified Experiment" type="RigidBody3D" parent="." node_paths=PackedStringArray("buoyant_cells")]
-transform = Transform3D(-0.994964, -1.30385e-08, -0.10024, 7.31041e-08, 1, -2.87383e-08, 0.10024, 1.19209e-07, -0.994964, -79.8999, 5, 9.36186)
+transform = Transform3D(-0.994964, -1.30385e-08, -0.10024, 7.31041e-08, 1, -2.87383e-08, 0.10024, 1.19209e-07, -0.994964, -115.621, 6, 16.9756)
 mass = 1.04378e+06
 gravity_scale = 0.0
 center_of_mass_mode = 1
@@ -323,6 +326,9 @@ parent = NodePath("..")
 cell_density_kg_per_m3 = 1100.0
 calc_f_gravity = true
 
+[node name="Camera focus" type="Node3D" parent="Ferry Simplified Experiment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.24855, -2.84217e-14)
+
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 0
@@ -332,6 +338,7 @@ offset_bottom = 40.0
 [node name="CanvasLayer" type="CanvasLayer" parent="Control"]
 
 [node name="Screen-Space Canvas Shader - Tilt Shift" type="ColorRect" parent="Control/CanvasLayer"]
+z_index = -1
 material = SubResource("ShaderMaterial_cegan")
 anchors_preset = 15
 anchor_right = 1.0

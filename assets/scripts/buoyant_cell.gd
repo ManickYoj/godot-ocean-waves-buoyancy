@@ -17,14 +17,13 @@ func _physics_process(delta: float) -> void:
 	if !active:
 		return
 
-	apply_force_on_cell(delta)
+	apply_force_on_cell()
 
 	if engine_force > 0:
-		apply_engine_force_on_cell(delta)
+		apply_engine_force_on_cell()
 	
-func apply_engine_force_on_cell(delta: float) -> void:
-	print("firing engine")
-	parent.apply_force( to_global(Vector3(-engine_force, 0, 0)), global_position - parent.global_position)
+func apply_engine_force_on_cell() -> void:
+	parent.apply_force(to_global(Vector3(-engine_force, 0, 0)), global_position - parent.global_position)
 	
 
 # Divides the cell 1 time, into 8 cells.
@@ -63,7 +62,7 @@ func mass() -> float:
 # feel their weight correctly. Uneven weights will distribute correctly and you
 # could even simulate sinking as some boxes gain weight equal to or greater than
 # the volume of water they displace
-func apply_force_on_cell(delta: float) -> void:
+func apply_force_on_cell() -> void:
 	var size = mesh.size
 	var volume: float = size.x * size.y * size.z
 	var depth: float = water.get_wave_height(global_position) - global_position.y
