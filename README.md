@@ -3,6 +3,8 @@ This fork aims to combining the best of the Godot ocean work from 2Retr0, krautd
 - From [2Retr0's repo](https://github.com/2Retr0/GodotOceanWaves) we take the original, beautiful FFT ocean wave implementation
 - From [krautdev](https://github.com/krautdev/GodotOceanWaves), I tried to take the depth-sampling work, but ran into issues getting it to run. Rather, I just took the depth color absorption addition to the filter
 - From [Lucatatus22](https://github.com/Lucactus22/GodotOceanWaves_bouyancy), I integrated the depth-sampling I have here as well as an 8km clipmap (which extends to the visual horizon from a decent height off the waves), but scrapped parts that were unnecessary and caused poor performance.
+  
+- Additionally, this repo includes use of this wonderful (photoscan?) [model of a Swedish ferry](https://sketchfab.com/3d-models/ss-norrtelje-1900-4a66ca23ba7640ae87e7a0117897d9c7), courtesy of the Swedish National Maritime and Transport Museums
 
 In addition, I've improved on the Lucatatus22 solution for buoyancy. Luctatus22's simulation relied on points on a mesh as 'sprung' from the water's surface. That can simulate some reasonable results but does not at all account for the submerged volume and so only works you tune the forces and masses quite precisely for each object. My simulation uses BoxShape2D cells as buoyant 'cells' with independent densities that apply approximated forces for gravity and buoyancy at the cell's center and determine forces automatically based on the cells' volume.
 
@@ -19,9 +21,10 @@ https://github.com/user-attachments/assets/fe37fde5-51bf-4512-9cba-7e3bb36739da
 
 Above: A box floating with an octet of equal sized, equal density cells
 
-https://github.com/user-attachments/assets/3068c10b-b781-465f-a093-fd14d6cd6dd0
 
-Above: Had some fun with shaders too. Boat is a hex of floation cells with a fore and aft ballast cell underneath
+![calm_water_and_colorful_smoke](https://github.com/user-attachments/assets/73ac87e9-d226-46cc-94fd-0f5af89ca056)
+
+Above: Had some fun with shaders too. Though minimized the waves. Boat is a hex of floation cells with a fore and aft ballast cell underneath
 
 ### TODO:
 - [x] Calculate the volume of the submerged object and use that to determine the resultant buoyant force, rather than approximating at vertices based on a constant, volume independent force as it does now
