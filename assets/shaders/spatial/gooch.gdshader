@@ -19,15 +19,15 @@ void fragment() {
 void light() {
 	float gooch = (1.0f + dot(LIGHT, NORMAL)) / 2.0;
 	gooch *= ATTENUATION;
-	
+
 	vec3 kCold = cold.rgb + cold_strength * ALBEDO.rgb;
 	vec3 kWarm = warm.rgb + warm_strength * ALBEDO.rgb;
-	
+
 	vec3 gooch_diffuse = gooch * kWarm + (1.0 - gooch) * kCold;
 	vec3 reflection_dir = reflect(-LIGHT, NORMAL);
 	float specular = DotClamped(VIEW, reflection_dir);
 	specular = pow(specular, smoothness * 32.0) * 5.0;
-	
+
 	DIFFUSE_LIGHT += gooch_diffuse * ATTENUATION;
 	SPECULAR_LIGHT += specular * ATTENUATION * LIGHT_COLOR;
 }

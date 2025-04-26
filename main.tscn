@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://assets/scripts/main.gd" id="1_skarq"]
 [ext_resource type="Script" uid="uid://dddasf5sla0ws" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
-[ext_resource type="Shader" uid="uid://bn52s82wk3tyu" path="res://assets/shaders/spatial/depth.gdshader" id="4_ryguw"]
+[ext_resource type="Shader" uid="uid://6tcnb8qqkae" path="res://assets/shaders/spatial/outline.gdshader" id="4_ryguw"]
 [ext_resource type="Script" uid="uid://4j6vkvpadkr7" path="res://assets/player/camera.gd" id="4_v2yip"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="5_lt75t"]
 [ext_resource type="ArrayMesh" uid="uid://qexqjidelskc" path="res://assets/water/clipmap_high_8k.obj" id="5_w48qg"]
@@ -74,7 +74,7 @@ frustum_focal_length = 180.0
 render_priority = 0
 shader = ExtResource("4_ryguw")
 shader_parameter/sensitivity = 0.5
-shader_parameter/outline_thickness = 0.5
+shader_parameter/outline_thickness = 0.3
 shader_parameter/step_threshold = 1.0
 shader_parameter/outline_color = Color(0.227601, 0.0705322, 0.0802094, 1)
 
@@ -280,7 +280,7 @@ script = ExtResource("5_yaehf")
 target = NodePath("../../Ferry Simplified Experiment")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, 0, -32)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -112, 0, -9)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
