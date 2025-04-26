@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode world_vertex_coords, depth_draw_always, wireframe;
+render_mode world_vertex_coords; //, depth_draw_never; //wireframe;// , depth_draw_always;
 /**
  * Water lighting model roughly follows the 2019 GDC talk: "Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas".
  * Source: https://gpuopen.com/gdc-presentations/2019/gdc-2019-agtd6-interactive-water-simulation-in-atlas.pdf
@@ -116,30 +116,29 @@ void fragment() {
 	if (ALPHA < 0.9){
 		foam_factor = clamp(foam_factor + 0.5 - ALPHA, 0.0, 1.0);
 	}
-	
+
 	// Depth color tinting of submerged objects
 	float depth_visibility_range = clamp(max(depth_color_consumption.r, max(depth_color_consumption.g,depth_color_consumption.b)),0.0,200.0);
 	float factor_translucency =  1.0 - smoothstep(world_pos.z + depth_visibility_range, world_pos.z, VERTEX.z);
 	factor_translucency = clamp(factor_translucency,0.35,1.0);
 	vec3 screen_albedo = texture(screen_texture, SCREEN_UV, 0.0).rgb;
 	vec3 depth_water_color = mix(screen_albedo, water_color.rgb, factor_translucency);
-	
+
 	float smooth_red = 0.0 + smoothstep(world_pos.z + depth_color_consumption.r, world_pos.z, VERTEX.z);
 	float smooth_green = 0.0 + smoothstep(world_pos.z + depth_color_consumption.g, world_pos.z, VERTEX.z);
 	float smooth_blue = 0.0 + smoothstep(world_pos.z + depth_color_consumption.b, world_pos.z, VERTEX.z);
 	vec3 color_shallow = max(vec3(smooth_red, smooth_green, smooth_blue) * depth_water_color, water_color.rgb);
 	//vec3 color_shallow = vec3(smooth_red, smooth_green, smooth_blue) * depth_water_color;
-	
-	
+
+
 	depth_water_color = mix(color_shallow, water_color.rgb, factor_translucency);
 	// ===================== shine through ===================================#
 	ALBEDO = mix(depth_water_color, foam_color.rgb, foam_factor * foam_alpha * foam_alpha);
 	fresnel = mix(pow(1.0 - dot(VIEW, NORMAL), 5.0*exp(-2.69*roughness)) / (1.0 + 22.7*pow(roughness, 1.5)), 1.0, REFLECTANCE);
 	ROUGHNESS = (1.0 - fresnel) * foam_factor + 0.4; // Roughness is proportional to foam/fog amount and fresnel.
-	
-	gradient *= mix(0.015, normal_strength, exp(-dist*0.0175)); // Blend normal with terrain normal as distance increases.
-	NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
 
+	gradient *= mix(0.015, normal_strength, exp(-dist*0.0175)); // Blend normal with terrain normal as distance increases.
+	//NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
 }
 
 float smith_masking_shadowing(in float cos_theta, in float alpha) {
