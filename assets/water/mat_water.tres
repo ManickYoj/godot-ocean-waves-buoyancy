@@ -2,7 +2,7 @@
 
 [sub_resource type="Shader" id="Shader_l4ax1"]
 code = "shader_type spatial;
-render_mode world_vertex_coords, depth_draw_always;
+render_mode world_vertex_coords; //, depth_draw_never; //wireframe;// , depth_draw_always;
 /**
  * Water lighting model roughly follows the 2019 GDC talk: \"Wakes, Explosions and Lighting: Interactive Water Simulation in Atlas\".
  * Source: https://gpuopen.com/gdc-presentations/2019/gdc-2019-agtd6-interactive-water-simulation-in-atlas.pdf
@@ -141,8 +141,7 @@ void fragment() {
 	ROUGHNESS = (1.0 - fresnel) * foam_factor + 0.4; // Roughness is proportional to foam/fog amount and fresnel.
 
 	gradient *= mix(0.015, normal_strength, exp(-dist*0.0175)); // Blend normal with terrain normal as distance increases.
-	NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
-
+	//NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
 }
 
 float smith_masking_shadowing(in float cos_theta, in float alpha) {
@@ -185,4 +184,4 @@ shader = SubResource("Shader_l4ax1")
 shader_parameter/depth_color_consumption = Vector3(7.5, 22, 38)
 shader_parameter/roughness = 0.65
 shader_parameter/normal_strength = 1.0
-shader_parameter/map_scales = PackedVector4Array(0.0078125, 0.0078125, 1, 1, 0.0175439, 0.0175439, 0.75, 1, 0.0625, 0.0625, 0, 0.25)
+shader_parameter/map_scales = PackedVector4Array(0.0119048, 0.0119048, 1, 1, 0.0175439, 0.0175439, 1, 1, 0.0357143, 0.0357143, 0.5, 0.25, 0.2, 0.2, 0.1, 0.1)
