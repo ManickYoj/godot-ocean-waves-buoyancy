@@ -6,16 +6,11 @@ render_mode unshaded;
 // Annoyingly, since this is set at compile, it seems you need to manually
 // set this array size to match the number of colors in your array. Otherwise
 // it will disregard the 'extra' colors
-uniform vec4[10] colors : source_color;
+uniform vec4[256] colors : source_color;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
-
-// blur parameters
-uniform float blur_amount : hint_range(-2.0, 10.0);
-
 
 const vec3 D65_WHITE = vec3(0.95045592705, 1.0, 1.08905775076);
 const vec3 WHITE = D65_WHITE;
-
 
 // RGB to LAB implementation from
 // https://github.com/sv3/gift/blob/master/RGB2Lab.glsl
@@ -54,12 +49,8 @@ vec3 rgb_to_lab(vec4 rgb){
     return vec3(L,a,b);
 }
 
-
 void fragment() {
-	vec4 blurred = textureLod(SCREEN_TEXTURE, SCREEN_UV, blur_amount);
-	//blurred.a = 255.0;
-
-	vec4 color = blurred; // texture(SCREEN_TEXTURE, SCREEN_UV).rgba;
+	vec4 color = texture(SCREEN_TEXTURE, SCREEN_UV).rgba;
 	float min_dist = FLT_MAX;
 	for(int i=0;i<colors.length(); i++) {
 		float dist = distance(

@@ -20,8 +20,8 @@ func _physics_process(delta: float) -> void:
 		return
 
 	# TODO: Acting strangely
-	apply_force_on_octets()
-	#apply_force_on_cell(global_position, mesh.size)
+	#apply_force_on_octets()
+	apply_force_on_cell(global_position, mesh.size)
 
 	if engine_force > 0:
 		apply_engine_force_on_cell()

@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=8 format=3 uid="uid://cvakls5fcggnl"]
+
+[ext_resource type="Shader" uid="uid://ci54dl3rn77kq" path="res://assets/shaders/cube_skybox.gdshader" id="1_rxx0i"]
+[ext_resource type="Texture2D" uid="uid://da45cdfbnxv13" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_BACK.png" id="2_wssbr"]
+[ext_resource type="Texture2D" uid="uid://dwxlejkq5lqaj" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_DOWN.png" id="3_up8o2"]
+[ext_resource type="Texture2D" uid="uid://c48dmu2qcnpsc" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_FRONT.png" id="4_8r4de"]
+[ext_resource type="Texture2D" uid="uid://pvaks7p3dh27" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_LEFT.png" id="5_4yck1"]
+[ext_resource type="Texture2D" uid="uid://1gm06jnins18" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_RIGHT.png" id="6_bs53b"]
+[ext_resource type="Texture2D" uid="uid://nf02nr43l3ub" path="res://assets/textures/skybox/nebula/jettelly_space_nebulas_blue_UP.png" id="7_w8s1r"]
+
+[resource]
+shader = ExtResource("1_rxx0i")
+shader_parameter/front = ExtResource("4_8r4de")
+shader_parameter/back = ExtResource("2_wssbr")
+shader_parameter/left = ExtResource("5_4yck1")
+shader_parameter/right = ExtResource("6_bs53b")
+shader_parameter/top = ExtResource("7_w8s1r")
+shader_parameter/bottom = ExtResource("3_up8o2")

@@ -1,8 +1,9 @@
-[gd_scene load_steps=58 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=60 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" uid="uid://ps3ogobs3y3b" path="res://assets/scripts/main.gd" id="1_skarq"]
+[ext_resource type="Material" uid="uid://cvakls5fcggnl" path="res://assets/shaders/cube_skybox.tres" id="2_getpj"]
 [ext_resource type="Script" uid="uid://dddasf5sla0ws" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
-[ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
+[ext_resource type="Texture2D" uid="uid://beaj3lwnru7hx" path="res://assets/textures/skybox/lroc_color_poles_1k.jpg" id="3_d13ii"]
 [ext_resource type="Shader" uid="uid://6tcnb8qqkae" path="res://assets/shaders/spatial/outline.gdshader" id="4_ryguw"]
 [ext_resource type="Script" uid="uid://4j6vkvpadkr7" path="res://assets/player/camera.gd" id="4_v2yip"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="5_lt75t"]
@@ -20,22 +21,20 @@
 [ext_resource type="Shader" uid="uid://di3q3um10ga2l" path="res://assets/shaders/canvas/tilt-shift-canvas.gdshader" id="18_074og"]
 [ext_resource type="Shader" uid="uid://c5xpb65l4d5mr" path="res://assets/shaders/spatial/stylized-smoke.tres" id="18_82xsv"]
 [ext_resource type="Texture2D" uid="uid://0o6ffidptqbm" path="res://assets/textures/T_PerlinNoise_Tiled11_inv.png" id="19_getpj"]
+[ext_resource type="Gradient" uid="uid://cpkmitgxlwps" path="res://assets/colors/orange-to-purple-smoke-gradient.tres" id="20_ryguw"]
 [ext_resource type="Shader" uid="uid://c66ny4vrtrhdl" path="res://assets/shaders/canvas/posterize.gdshader" id="21_getpj"]
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
-panorama = ExtResource("3_0ksgj")
-
 [sub_resource type="Sky" id="Sky_vroi3"]
-sky_material = SubResource("PanoramaSkyMaterial_t7jwl")
+sky_material = ExtResource("2_getpj")
 
 [sub_resource type="Environment" id="Environment_icybu"]
-background_mode = 1
+background_mode = 2
 background_color = Color(0.623529, 0.737255, 0.792157, 1)
 sky = SubResource("Sky_vroi3")
 ambient_light_source = 3
 ambient_light_color = Color(0.828253, 0.944665, 0.986779, 1)
 reflected_light_source = 2
-tonemap_mode = 2
+tonemap_mode = 3
 ssr_enabled = true
 ssao_radius = 6.4
 ssao_intensity = 15.0
@@ -56,7 +55,7 @@ fog_depth_begin = 200.0
 fog_depth_end = 350.0
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.004
-volumetric_fog_albedo = Color(0.19904, 0.840141, 0.802238, 1)
+volumetric_fog_albedo = Color(0.332554, 0.629008, 0.716125, 1)
 volumetric_fog_anisotropy = 0.1
 volumetric_fog_length = 512.0
 adjustment_enabled = true
@@ -69,13 +68,26 @@ auto_exposure_scale = 0.2
 frustum_focus_distance = 40.0
 frustum_focal_length = 180.0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1u8w0"]
+albedo_texture = ExtResource("3_d13ii")
+emission = Color(0.860369, 0.860369, 0.860369, 1)
+emission_energy_multiplier = 2.0
+subsurf_scatter_strength = 1.0
+billboard_mode = 2
+billboard_keep_scale = true
+
+[sub_resource type="SphereMesh" id="SphereMesh_0odxb"]
+material = SubResource("StandardMaterial3D_1u8w0")
+radius = 30.0
+height = 60.0
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_074og"]
 render_priority = 0
 shader = ExtResource("4_ryguw")
-shader_parameter/sensitivity = 0.5
+shader_parameter/sensitivity = 0.3
 shader_parameter/outline_thickness = 0.3
 shader_parameter/step_threshold = 1.0
-shader_parameter/outline_color = Color(0.227601, 0.0705322, 0.0802094, 1)
+shader_parameter/outline_color = Color(0.0453078, 0.00398679, 0.115343, 1)
 
 [sub_resource type="QuadMesh" id="QuadMesh_2cqfq"]
 material = SubResource("ShaderMaterial_074og")
@@ -154,10 +166,10 @@ shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_tsx6q")
 [sub_resource type="QuadMesh" id="QuadMesh_06d3e"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_riff4"]
-density = 8.0
-albedo = Color(0.988718, 0.989631, 0.989629, 1)
-height_falloff = 0.176
-edge_fade = 1.75
+density = 4.0
+albedo = Color(0.202328, 0.215598, 0.215607, 1)
+height_falloff = 0.535888
+edge_fade = 1.32625
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_82xsv"]
 size = Vector3(44, 8, 8.67642)
@@ -191,12 +203,9 @@ point_count = 3
 [sub_resource type="CurveTexture" id="CurveTexture_d13ii"]
 curve = SubResource("Curve_ryguw")
 
-[sub_resource type="Gradient" id="Gradient_1u8w0"]
-offsets = PackedFloat32Array(0, 0.129032, 0.262673, 1)
-colors = PackedColorArray(0.736486, 0.433652, 0.0976416, 1, 0.274526, 0.532291, 0.358667, 1, 0.361049, 0.598611, 0.627552, 1, 0.4907, 0.638778, 0.638693, 1)
-
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_0odxb"]
-gradient = SubResource("Gradient_1u8w0")
+resource_local_to_scene = true
+gradient = ExtResource("20_ryguw")
 
 [sub_resource type="Curve" id="Curve_cegan"]
 _data = [Vector2(0, 0.292135), 0.0, 8.00144, 0, 0, Vector2(0.0979021, 0.52439), 0.666786, 0.666786, 0, 0, Vector2(1, 0.906743), 0.140376, 0.0, 0, 0]
@@ -255,8 +264,7 @@ shader_parameter/blur = 3.0
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_82xsv"]
 resource_local_to_scene = true
 shader = ExtResource("21_getpj")
-shader_parameter/colors = PackedColorArray(0.392157, 0, 0.0156863, 1, 0.780392, 0.258824, 0.137255, 1, 0.913725, 0.768627, 0.415686, 1, 0.666667, 0.74902, 0.694118, 1, 0.541176, 0.694118, 0.490196, 1, 0.353198, 0.668156, 0.653333, 1, 0.678431, 0.909804, 0.956863, 1, 1, 1, 1, 1)
-shader_parameter/blur_amount = 0.1
+shader_parameter/colors = PackedColorArray(0.392157, 0, 0.0156863, 1, 0.780392, 0.258824, 0.137255, 1, 0.898553, 0.687072, 0.465448, 1, 0.913725, 0.768627, 0.415686, 1, 0.541176, 0.694118, 0.490196, 1, 1, 1, 1, 1, 0.61317, 0.828964, 0.85299, 1, 0.456837, 0.783811, 0.767483, 1)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_skarq")
@@ -266,18 +274,31 @@ metadata/movie_file = "C:/Users/Nick/Documents/personal/projects/ocean-waves/cli
 environment = SubResource("Environment_icybu")
 camera_attributes = SubResource("CameraAttributesPhysical_cegan")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.945601, -0.0516921, 0.321197, -0.00840572, 0.983084, 0.18296, -0.325221, -0.175707, 0.929171, -22.099, 430.28, -75.1169)
-light_color = Color(0.963469, 0.966579, 0.955316, 1)
-light_energy = 1.2
+[node name="Moonlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.929198, -0.294861, 0.222817, -0.199343, -0.907532, -0.36966, 0.311212, 0.29907, -0.902056, 664.873, 148.604, -838.783)
+light_color = Color(0.963673, 0.966175, 0.957611, 1)
+light_energy = 0.5
 light_angular_distance = 0.5
+shadow_enabled = true
 shadow_bias = 0.0
 shadow_normal_bias = 6.464
 shadow_opacity = 0.8
 shadow_blur = 5.0
 
+[node name="Moon Mesh" type="MeshInstance3D" parent="Moonlight"]
+transform = Transform3D(1, -1.49012e-08, 0, -1.49012e-08, 1, 0, 0, 0, 1, 10.9639, 49.9142, 20.3313)
+mesh = SubResource("SphereMesh_0odxb")
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Moonlight/Moon Mesh"]
+transform = Transform3D(-0.909785, 0.414928, 0.0112062, 0.304667, 0.649201, 0.696934, 0.281902, 0.637474, -0.717048, 6.01743, 110.793, -106.541)
+light_energy = 500.0
+light_volumetric_fog_energy = 0.0
+light_size = 1000.0
+spot_range = 356.915
+spot_angle = 23.0842
+
 [node name="Camera" type="Camera3D" parent="." node_paths=PackedStringArray("target")]
-transform = Transform3D(0.926447, -0.086105, -0.366445, 0.0368336, 0.989552, -0.139396, 0.374618, 0.115646, 0.919938, -149.354, 16.0617, 78.3364)
+transform = Transform3D(0.926447, -0.352015, -0.133345, 0.0368336, 0.437315, -0.898553, 0.374618, 0.827552, 0.418115, -149.354, 16.0617, 78.3364)
 fov = 20.0
 far = 10000.0
 script = ExtResource("4_v2yip")
@@ -293,7 +314,7 @@ script = ExtResource("5_yaehf")
 target = NodePath("../../Ferry Simplified Experiment")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -195, 0, 313)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 616, 0, -589)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -316,6 +337,7 @@ process_material = ExtResource("9_skbf4")
 draw_pass_1 = SubResource("QuadMesh_06d3e")
 
 [node name="FogVolume" type="FogVolume" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.919617, 3.38455, -0.255051)
 shape = 4
 material = SubResource("FogMaterial_riff4")
 
@@ -359,7 +381,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 120.0
+cell_density_kg_per_m3 = 150.0
 
 [node name="AS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -16, -4.20733, 3)
@@ -369,7 +391,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 120.0
+cell_density_kg_per_m3 = 150.0
 
 [node name="MP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 0, -4, -3)
@@ -379,7 +401,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 180.0
+cell_density_kg_per_m3 = 150.0
 
 [node name="MS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 0, -4, 3)
@@ -389,7 +411,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 180.0
+cell_density_kg_per_m3 = 150.0
 
 [node name="FP Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 14, -4.3586, -2)
@@ -399,7 +421,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 200.0
+cell_density_kg_per_m3 = 130.0
 
 [node name="FS Cell" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 14, -4.3586, 2)
@@ -409,7 +431,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 200.0
+cell_density_kg_per_m3 = 130.0
 
 [node name="Fore Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 14.58, -7, 0)
@@ -419,7 +441,7 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 1200.0
+cell_density_kg_per_m3 = 1000.0
 
 [node name="Aft Ballast" type="MeshInstance3D" parent="Ferry Simplified Experiment" node_paths=PackedStringArray("water", "parent")]
 transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, -16.58, -7, 0)
@@ -429,13 +451,25 @@ script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
 calc_f_gravity = true
-cell_density_kg_per_m3 = 900.0
+cell_density_kg_per_m3 = 1200.0
 engine_force = 200000.0
 
 [node name="Camera focus" type="Node3D" parent="Ferry Simplified Experiment"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -7, 2.24855, -2.84217e-14)
 
-[node name="VFX Stylized Smoke" type="GPUParticles3D" parent="Ferry Simplified Experiment"]
+[node name="Daytime VFX Stylized Smoke" type="GPUParticles3D" parent="Ferry Simplified Experiment"]
+transform = Transform3D(-4.37114e-08, 7.10543e-15, -1, 5.55112e-15, 1, 3.55271e-14, 1, 0, -4.37114e-08, 0.309174, 5.80079, 0.217015)
+material_override = SubResource("ShaderMaterial_getpj")
+emitting = false
+amount = 75
+lifetime = 9.0
+preprocess = 9.0
+explosiveness = 0.01
+fixed_fps = 60
+process_material = SubResource("ParticleProcessMaterial_cegan")
+draw_pass_1 = SubResource("SphereMesh_cegan")
+
+[node name="Nighttime VFX Stylized Smoke" type="GPUParticles3D" parent="Ferry Simplified Experiment"]
 transform = Transform3D(-4.37114e-08, 7.10543e-15, -1, 5.55112e-15, 1, 3.55271e-14, 1, 0, -4.37114e-08, 0.309174, 5.80079, 0.217015)
 material_override = SubResource("ShaderMaterial_getpj")
 amount = 75
