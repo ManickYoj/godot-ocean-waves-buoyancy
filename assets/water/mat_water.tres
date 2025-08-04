@@ -185,4 +185,4 @@ shader = SubResource("Shader_l4ax1")
 shader_parameter/depth_color_consumption = Vector3(7.5, 22, 38)
 shader_parameter/roughness = 0.65
 shader_parameter/normal_strength = 1.0
-shader_parameter/map_scales = PackedVector4Array(0.0078125, 0.0078125, 1, 1, 0.0175439, 0.0175439, 0.75, 1, 0.0625, 0.0625, 0, 0.25)
+shader_parameter/map_scales = PackedVector4Array(0.0025, 0.0025, 0.75, 0.75, 0.0078125, 0.0078125, 0.5, 0.5, 0.0175439, 0.0175439, 0.1, 0.1, 0.04, 0.04, 0.1, 0.1)
