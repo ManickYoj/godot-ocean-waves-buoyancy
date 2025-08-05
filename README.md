@@ -1,4 +1,4 @@
-https://github.com/user-attachments/assets/60c8bb63-62f7-4b1d-9c8e-6a0673be1d3d
+https://github.com/user-attachments/assets/b4ffb25d-0f35-4041-8af7-ab0d61d141c9
 
 # manickyoj's fork of GodotOceanWaves
 This fork aims to combining the best of the Godot ocean work from 2Retr0, krautdev, and Lucactus22.
