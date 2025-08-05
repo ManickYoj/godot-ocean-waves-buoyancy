@@ -25,20 +25,25 @@ Above: A box floating with an octet of equal sized, equal density cells
 
 Above: Had some fun with shaders too. Though minimized the waves. Boat is a hex of floation cells with a fore and aft ballast cell underneath
 
-### TODO:
+## TODO:
+### Physics:
 - [x] Calculate the volume of the submerged object and use that to determine the resultant buoyant force, rather than approximating at vertices based on a constant, volume independent force as it does now
 - [x] Automatically sum the weights of buoyancy cells to the rigidbody to save manual config. Consider using something other than colliders to better preserve performance
 - [x] Show force gizmos to make sense of what the heck is happening in Godot's physics engine, especially with torques
-
 - [x] Simulate linear hydrodynamic drag vs global velocities as a way to resist linear forces
-- [ ] Simulate angular hydrodynamic drag vs global angular veolcities
-- [ ] Attempt to make hydrodynamic drag relative to wave action and wind direction, rather than artifical 'global' velocity
-
-- [ ] Get all directions into Godot's preferred coordinate system in which Forward is inexplicably (0, 0, -1), Right is (1, 0, 0), and Up is (0, 1, 0)
+- [x] Simulate angular hydrodynamic drag vs global angular velocities
 - [ ] Add an option to automatically subdivide one big cell into quadrants or octets to minimize the amount of manual cell creation needed to set up a boat
-- [ ] Make a cool demo of a ship taking damage and starting to list and sink
+- [ ] Attempt to make hydrodynamic drag relative to wave action and wind direction, rather than artifical 'global' velocity
+- [ ] Get all directions into Godot's preferred coordinate system in which Forward is inexplicably (0, 0, -1), Right is (1, 0, 0), and Up is (0, 1, 0)
 
+### Visuals
+- [ ] Bring back sea spray that was implemented in 2Retr0's version
 - [ ] Keep the water out of boats, perhaps. Water washing over the boats is a little cool, but water welling up within a boat or disappearing to nothing is less cool. Luctatus22's README has some ideas here
-- [ ] See if I can figure out the same thing krautdev and Luctatus22 were working on: reading displacement textures from the GPU more efficiently, or simply duplicating the FFT calculation. Luctatus22's README has some ideas here
 - [ ] Add some nice VFX for wakes and splashes when a hull slaps down on water
+
+### Performance
+- [ ] See if I can figure out the same thing krautdev and Luctatus22 were working on: reading displacement textures from the GPU more efficiently, or simply duplicating the FFT calculation. Luctatus22's README has some ideas here. KrautDev pointed out that Godot 4.4 made async reads from the GPU available, and this doesn't use that yet
 - [ ] Figure out how to get the shader to a level of performance where it can work on a laptop without a dedicated graphics card
+
+### Demos
+- [ ] Make a demo of a ship taking damage and starting to list and sink
