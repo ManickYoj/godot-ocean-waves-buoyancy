@@ -11,7 +11,7 @@ ERROR: Set: 0 Binding: 0 Type: Image Writable: N Length: 1
 ERROR: Set: 1 Binding: 0 Type: StorageBuffer Writable: Y Length: 0
 ```
 
-This error apparantly comes from heaving the uniforms in the shaders set to readonly. I came across this forum post which pointed me in this direction:
+This error apparantly comes from having the uniforms in the shaders set to readonly. I came across this forum post which pointed me in this direction:
 https://forum.godotengine.org/t/what-causes-the-error-uniforms-supplied-for-set-0/123044
 Removing all "readonly" attributes for the uniforms in the shaders seems to have fixed this.
 
