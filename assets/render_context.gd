@@ -119,11 +119,13 @@ func create_pipeline(block_dimensions : Array, descriptor_sets : Array, shader :
 
 ## Returns a [PackedFloat32Array] from the provided data, whose size is rounded up to the nearest
 ## multiple of 16
+## FIX for error from 4.7. see: https://github.com/godotengine/godot/issues/120097, got errors like: ERROR: This compute pipeline requires (8) bytes of push constant data, supplied: (16) 
+## Changed to multiplying by 2 because of padding change (https://github.com/godotengine/godot/pull/114075); not sure this is the correct value, following one of the comments here.
 static func create_push_constant(data : Array) -> PackedByteArray:
 	var packed_size := len(data)*4
 	assert(packed_size <= 128, 'Push constant size must be at most 128 bytes!')
 
-	var padding := ceili(packed_size/16.0)*16 - packed_size
+	var padding := ceili(packed_size/16.0)*2 - packed_size
 	var packed_data := PackedByteArray();
 	packed_data.resize(packed_size + (padding if padding > 0 else 0));
 	packed_data.fill(0);

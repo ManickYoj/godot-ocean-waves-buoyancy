@@ -18,7 +18,8 @@ layout(std430, set = 0, binding = 1) restrict buffer FFTBuffer {
 	vec2 data[]; // map_size x map_size x num_spectra x 2 * num_cascades
 };
 
-layout(push_constant) restrict readonly uniform PushConstants {
+/** FIX for 4.5, removed readonly. See https://forum.godotengine.org/t/what-causes-the-error-uniforms-supplied-for-set-0/123044 */
+layout(push_constant) restrict uniform PushConstants {
 	uint cascade_index;
 };
 
