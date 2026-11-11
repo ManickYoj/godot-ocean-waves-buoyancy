@@ -13,10 +13,9 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(rgba16f, set = 0, binding = 0) restrict writeonly uniform image2DArray spectrum;
+layout(rgba32f, set = 0, binding = 0) restrict writeonly uniform image2DArray spectrum;
 
-/** FIX for 4.5, removed readonly. See https://forum.godotengine.org/t/what-causes-the-error-uniforms-supplied-for-set-0/123044 */
-layout(push_constant) restrict uniform PushConstants {
+layout(push_constant) restrict readonly uniform PushConstants {
 	ivec2 seed;
 	vec2 tile_length;
 	float alpha;

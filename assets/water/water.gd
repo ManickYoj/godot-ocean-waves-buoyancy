@@ -4,6 +4,12 @@ extends MeshInstance3D
 ## Handles updating the displacement/normal maps for the water material as well as
 ## managing wave generation pipelines.
 
+## Should the ocean update in the editor?
+@export var simulateInEditor : bool : 
+	set(value):
+		if value: _setup_wave_generator() ## Added here to quickly regenerate the waves, sometimes they disappear in the editor
+		simulateInEditor = value 
+
 const WATER_MAT := preload('res://assets/water/mat_water.tres')
 const SPRAY_MAT := preload('res://assets/water/mat_spray.tres')
 const WATER_MESH_HIGH8K := preload('res://assets/water/clipmap_high_8k.obj')
@@ -114,6 +120,21 @@ func _ready() -> void:
 func _process(delta : float) -> void:
 	# TODO: These should probably be the same update
 	# Update waves once every 1.0/updates_per_second.
+	if Engine.is_editor_hint():
+		if not simulateInEditor:
+			return
+		else:
+			_update_ocean(delta)
+	else:
+		_update_ocean(delta)
+		
+	# Resample displacement
+	_accumulator += delta;
+	if _accumulator >= _displacement_update_rate:
+		_accumulator -= _displacement_update_rate
+		_img = wave_generator.retrieve_displacement_map(0, _img)
+
+func _update_ocean(delta: float) -> void:
 	if updates_per_second == 0 or time >= next_update_time:
 		var target_update_delta := 1.0 / (updates_per_second + 1e-10)
 		var update_delta := delta if updates_per_second == 0 else target_update_delta + (time - next_update_time)
@@ -121,12 +142,6 @@ func _process(delta : float) -> void:
 		_update_water(update_delta)
 	time += delta
 	
-	# Resample displacement
-	_accumulator += delta;
-	if _accumulator >= _displacement_update_rate:
-		_accumulator -= _displacement_update_rate
-		_img = wave_generator.retrieve_displacement_map(0, _img)
-
 func _setup_wave_generator() -> void:
 	if parameters.size() <= 0: return
 	for param in parameters:

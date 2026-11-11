@@ -1,6 +1,6 @@
 extends RigidBody3D
 
-@export var debug: bool = false
+
 @export var buoyant_cells: Array[MeshInstance3D]
 @export var drag_coef_axial: float = 0.15;
 @export var drag_coef_lateral: float = 1;
@@ -10,20 +10,27 @@ extends RigidBody3D
 @export var drag_coef_roll: float = 100;
 @export var mesh: MeshInstance3D;
 
+@export_group("Debugging")
+@export var debug: bool = false
+@export var global_mass_multiplier: float = 1 ## Quickly modify entire mass calc for fine-tuning ship responsiveness to waves
+
+
 # TODO: Move to global config
 const DEBUG_FORCE_SCALE: float = 0.000015;
-
 const WATER_MASS_DENSITY := 1000; # kg / m^3
 const DRAG_SCALE: float = 1;
 
 func _ready() -> void:
+	calculate_and_set_mass_and_inertia()
+	
+func calculate_and_set_mass_and_inertia() -> void:
 	var prospective_mass = 0 # Error if 0
 	var bounds = Vector3.ZERO
 	for cell in buoyant_cells:
 		bounds = bounds.max(abs(cell.position) + abs(0.5 * cell.mesh.size))
 		prospective_mass += cell.mass()
 
-	mass = prospective_mass
+	mass = prospective_mass * global_mass_multiplier
 	inertia = Vector3(pow(bounds.y * bounds.z * 0.15, 2), pow(bounds.x * bounds.z * 0.15, 2), pow(bounds.x * bounds.y * 0.15, 2)) * mass
 
 	if debug:
