@@ -1,6 +1,13 @@
 @tool
 extends Node3D
 
+## Should the ocean transform shift, following player/camera position
+@export var shiftingWorldCenter : bool : 
+	set(value):
+		if not value: water.global_position = Vector3.ZERO
+		shiftingWorldCenter = value 
+
+
 var clipmap_tile_size := 1.0 # Not the smallest tile size, but one that reduces the amount of vertex jitter.
 var previous_tile := Vector3i.MAX
 var should_render_imgui := not Engine.is_editor_hint()
@@ -34,10 +41,11 @@ func _process(delta : float) -> void:
 
 func _physics_process(delta: float) -> void:
 	# Shift water mesh whenever player moves into a new tile.
-	var tile := (Vector3(camera.global_position.x, 0.0, camera.global_position.z) / clipmap_tile_size).ceil()
-	if not tile.is_equal_approx(previous_tile):
-		water.global_position = tile * clipmap_tile_size
-		previous_tile = tile
+	if shiftingWorldCenter:
+		var tile := (Vector3(camera.global_position.x, 0.0, camera.global_position.z) / clipmap_tile_size).ceil()
+		if not tile.is_equal_approx(previous_tile):
+			water.global_position = tile * clipmap_tile_size
+			previous_tile = tile
 
 	# Vary audio samples based on total wind speed across all cascades.
 	var total_wind_speed := 0.0

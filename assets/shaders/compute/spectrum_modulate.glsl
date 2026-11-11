@@ -15,7 +15,9 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(rgba16f, set = 0, binding = 0) restrict readonly uniform image2DArray spectrum;
+/** FIX for 4.5, removed readonly. See https://forum.godotengine.org/t/what-causes-the-error-uniforms-supplied-for-set-0/123044 */
+/** Also added changes to texture depth from https://github.com/krautdev/GodotOceanWaves/pull/1/changes?file-filters%5B%5D=dotfile&file-filters%5B%5D=.yml&file-filters%5B%5D=.gd&file-filters%5B%5D=.glsl&file-filters%5B%5D=.import&file-filters%5B%5D=.tres&file-filters%5B%5D=.tscn&file-filters%5B%5D=.godot#diff-b5d2dbca732ff97c8849d91a1ac92ed7e07ce0f45e9568ebd13b4e847212c242 */
+layout(rgba32f, set = 0, binding = 0) restrict uniform image2DArray spectrum;
 
 layout(std430, set = 1, binding = 0) restrict writeonly buffer FFTBuffer {
 	vec2 data[]; // map_size x map_size x num_spectra x 2 * num_cascades

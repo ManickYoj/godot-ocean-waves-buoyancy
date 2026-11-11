@@ -4,7 +4,8 @@ extends MeshInstance3D
 @export var parent : RigidBody3D
 @export var cell_density_kg_per_m3: float = 500; # 500 is about right for solid wood, though 300-900 are acceptable ranges
 @export var calc_f_gravity: bool = false; # True if this should simulate gravity on this cell. 0 if gravity is calculated on the whole rigidbody
-@export var engine_force: float = 0; # If not 0 provides thrust of the amount given at this cell in the local X direction
+@export var engine_force: float = 0; # provides thrust of the amount given at this cell in the local X direction
+@export var useEngine: bool = false; # True if engine force should be applied
 @export var debug: bool = false; # True if this should simulate gravity on this cell. 0 if gravity is calculated on the whole rigidbody
 @export var active: bool = true; # If false, does nothing
 
@@ -22,7 +23,7 @@ func _physics_process(delta: float) -> void:
 
 	apply_force_on_cell(delta)
 
-	if engine_force > 0:
+	if useEngine && engine_force > 0:
 		apply_engine_force_on_cell(delta)
 	
 func apply_engine_force_on_cell(delta: float) -> void:
@@ -73,7 +74,7 @@ func mass() -> float:
 func apply_force_on_cell(delta: float) -> void:
 	var size = mesh.size
 	var volume: float = size.x * size.y * size.z
-	var depth: float = water.get_wave_height(global_position) - global_position.y
+	var depth: float = water.get_height(global_position) - global_position.y
 	
 	var gravity = ProjectSettings.get_setting("physics/3d/default_gravity_vector") * ProjectSettings.get_setting("physics/3d/default_gravity")
 	#var cube_side_length = pow(volume, 1.0/3.0)
