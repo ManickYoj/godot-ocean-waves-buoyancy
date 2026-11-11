@@ -281,7 +281,7 @@ mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
-cell_density_kg_per_m3 = 150.0
+cell_density_kg_per_m3 = 50.0
 calc_f_gravity = true
 engine_force = 400000.0
 
@@ -291,7 +291,7 @@ mesh = SubResource("BoxMesh_cegan")
 script = ExtResource("14_vivmo")
 water = NodePath("../../Water")
 parent = NodePath("..")
-cell_density_kg_per_m3 = 150.0
+cell_density_kg_per_m3 = 50.0
 calc_f_gravity = true
 
 [node name="HullDragVolume" type="MeshInstance3D" parent="Ferry Simplified Experiment" unique_id=1065016980]

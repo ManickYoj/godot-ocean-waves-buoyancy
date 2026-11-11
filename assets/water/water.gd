@@ -42,6 +42,7 @@ enum MeshQuality { LOW, HIGH, HIGH8K }
 		parameters = value
 		_setup_wave_generator()
 		_update_scales_uniform()
+		_setup_cpu_displacement_textures()
 
 @export_group('Performance Parameters')
 @export_enum('128x128:128', '256x256:256', '512x512:512', '1024x1024:1024') var map_size := 1024 :
@@ -82,64 +83,30 @@ var next_update_time := 0.0
 var displacement_maps := Texture2DArrayRD.new()
 var normal_maps := Texture2DArrayRD.new()
 
-var _accumulator = 0.0;
-var _displacement_update_rate: float;
-var _img: Image = null;
-var _img_height: int;
-var _img_width: int;
-var map_scales : PackedVector4Array;
 
-# ------ Public Interface ----- #
-func get_wave_height(global_position: Vector3) -> float:
-	var uv: Vector2 = Vector2(global_position.x, global_position.z)
-	var displacement: Vector3 = Vector3.ZERO
-	
-	# TODO: Do once for each cascade for best accuracy
-	var i = 0;
-	var scales: Vector4 = map_scales[i]
-	var sample_uv: Vector2 = uv * Vector2(scales.x, scales.y)
-	displacement += _sample_displacement(i, sample_uv) * scales.z
-	
-	return displacement.y
-
-# ------ Private Methods ----- #
 func _init() -> void:
 	rng.set_seed(1234) # This seed gives big waves!
 
 func _ready() -> void:
-	map_scales.resize(len(parameters))
-
 	RenderingServer.global_shader_parameter_set(&'water_color', water_color.srgb_to_linear())
 	RenderingServer.global_shader_parameter_set(&'foam_color', foam_color.srgb_to_linear())
 
-	_img = wave_generator.retrieve_displacement_map(0, _img)
-	_img_height = _img.get_height()
-	_img_width = _img.get_width()
-	_displacement_update_rate = (1 / displacement_updates_per_second)
+var update_textures:bool = true
+
+var just_calculated_water:bool = false
 
 func _process(delta : float) -> void:
-	# TODO: These should probably be the same update
 	# Update waves once every 1.0/updates_per_second.
-	if Engine.is_editor_hint():
-		if not simulateInEditor:
-			return
-		else:
-			_update_ocean(delta)
-	else:
-		_update_ocean(delta)
-		
-	# Resample displacement
-	_accumulator += delta;
-	if _accumulator >= _displacement_update_rate:
-		_accumulator -= _displacement_update_rate
-		_img = wave_generator.retrieve_displacement_map(0, _img)
-
-func _update_ocean(delta: float) -> void:
+	just_calculated_water = false
 	if updates_per_second == 0 or time >= next_update_time:
 		var target_update_delta := 1.0 / (updates_per_second + 1e-10)
 		var update_delta := delta if updates_per_second == 0 else target_update_delta + (time - next_update_time)
 		next_update_time = time + target_update_delta
 		_update_water(update_delta)
+		#_copy_cpu_displacement_textures_buffer()
+		if update_textures:
+			_manage_cpu_displacement_textures_updates(delta)
+		just_calculated_water = true
 	time += delta
 	
 func _setup_wave_generator() -> void:
@@ -161,7 +128,7 @@ func _setup_wave_generator() -> void:
 	RenderingServer.global_shader_parameter_set(&'normals', normal_maps)
 
 func _update_scales_uniform() -> void:
-	map_scales.resize(len(parameters))
+	var map_scales : PackedVector4Array; map_scales.resize(len(parameters))
 	for i in len(parameters):
 		var params := parameters[i]
 		var uv_scale := Vector2.ONE / params.tile_length
@@ -180,32 +147,79 @@ func _notification(what: int) -> void:
 		displacement_maps.texture_rd_rid = RID()
 		normal_maps.texture_rd_rid = RID()
 
-func _sample_displacement(cascade: int, uv: Vector2) -> Vector3:
-	# Wrap UVs
-	uv.x = wrapf(uv.x, 0.0, 1.0)
-	uv.y = wrapf(uv.y, 0.0, 1.0)
-	
-	# Calculate coordinates
-	var x: float = uv.x * (_img_width - 1)
-	var y: float = uv.y * (_img_width - 1)
-	
-	var x0 := int(floor(x))
-	var y0 := int(floor(y))
-	var x1 = min(x0 + 1, _img_width - 1)
-	var y1 = min(y0 + 1, _img_width - 1)
-	
-	var fx := x - x0
-	var fy := y - y0
-	
-	# Get cached pixel data
-	var c00: Color = _img.get_pixel(x0, y0) # _cached_displacements[y0 * img_width + x0]
-	var c10: Color = _img.get_pixel(x1, y0) # _cached_displacements[y0 * img_width + x1]
-	var c01: Color = _img.get_pixel(x0, y1) #_cached_displacements[y1 * img_width + x0]
-	var c11: Color = _img.get_pixel(x1, y1) #_cached_displacements[y1 * img_width + x1]
-	
-	# Bilinear interpolation
-	var col_x0 := c00.lerp(c10, fx)
-	var col_x1 := c01.lerp(c11, fx)
-	var col := col_x0.lerp(col_x1, fy)
-	
-	return Vector3(col.r, col.g, col.b)
+# =============================================================================
+#  displacement textures loading from gpu
+# =============================================================================
+
+var _cpu_displacement_textures : Dictionary = {} # dict idx:Image
+var _displacement_textures_total_update_interval:float = 1.0 / 120.0
+var _displacement_textures_update_time:float = 0.0
+var _texture_loading_index:int = 0
+
+# Godot 4.4+ reads the displacement maps back asynchronously:
+# texture_get_data_async() delivers the bytes in a callback during frame sync,
+# so the main thread never waits on the GPU and no worker thread/mutex is needed.
+# Godot 4.3 only has the blocking call, so its refresh rate is lowered instead.
+func _request_cpu_displacement_texture(cascade_index:int) -> void:
+	var descriptor = wave_generator.descriptors.get(&'displacement_map')
+	if descriptor == null: return
+	var device := RenderingServer.get_rendering_device()
+	if device.has_method(&'texture_get_data_async'):
+		device.texture_get_data_async(descriptor.rid, cascade_index, _store_cpu_displacement_texture.bind(cascade_index))
+	else:
+		_store_cpu_displacement_texture(device.texture_get_data(descriptor.rid, cascade_index), cascade_index)
+
+func _store_cpu_displacement_texture(data:PackedByteArray, cascade_index:int) -> void:
+	if not is_instance_valid(wave_generator): return
+	var size:int = wave_generator.map_size
+	if data.size() != size*size*8: return # RGBA16F
+	_cpu_displacement_textures[cascade_index] = Image.create_from_data(size, size, false, Image.FORMAT_RGBAH, data)
+
+func _setup_cpu_displacement_textures() -> void:
+	_cpu_displacement_textures.clear()
+	# A blocking readback of a 1024x1024 map is expensive, so poll it rarely.
+	if not RenderingServer.get_rendering_device().has_method(&'texture_get_data_async'):
+		_displacement_textures_total_update_interval = 1.0 / 15.0
+	for i in range(len(parameters)):
+		if parameters[i].displacement_scale > 0.001:
+			_request_cpu_displacement_texture(i)
+
+func _manage_cpu_displacement_textures_updates(delta:float) -> void:
+	var count := _cpu_displacement_textures.size()
+	if count == 0: return
+	_displacement_textures_update_time += delta
+	var time_per_texture:float = _displacement_textures_total_update_interval / float(count)
+	if _displacement_textures_update_time < time_per_texture: return
+	_displacement_textures_update_time = 0.0
+	var indices := _cpu_displacement_textures.keys()
+	indices.sort()
+	_texture_loading_index = (_texture_loading_index + 1) % count
+	_request_cpu_displacement_texture(indices[_texture_loading_index])
+
+func _world_to_uv(W:Vector2, tile_length:Vector2) -> Vector2:
+	return Vector2(
+		(W[0] - tile_length.x * floor(W[0] / tile_length.x)) / tile_length.x,
+		(W[1] - tile_length.y * floor(W[1] / tile_length.y)) / tile_length.y)
+
+func get_height(world_pos:Vector3, steps:int=3) -> float:
+	# needs to be translated to gdscript.
+	# each cascade is accessed in parameters array
+	# try to implement it just for the first cascade for now
+	var world_pos_xz = Vector2(world_pos.x,world_pos.z)
+	var cam_distance:float = (get_viewport().get_camera_3d().global_position - world_pos).length()
+	var summed_height:float = 0.0
+	for cascade_index in _cpu_displacement_textures.keys():
+		var displacement_scale:float = parameters[cascade_index].displacement_scale
+		var tile_length:Vector2 = parameters[cascade_index].tile_length
+		var d:Vector2 = Vector2.ZERO
+		var x:Vector2 = world_pos_xz
+		var y:Vector2 = Vector2.ZERO
+		var y_raw:Color=Color.BLACK
+		# iteratively approximate the correct uv to get the height of the vertex that was displaced in the XZ-axis
+		for i in range(steps):
+			var img_v = _world_to_uv(x, tile_length) * map_size
+			y_raw = _cpu_displacement_textures[cascade_index].get_pixelv(img_v)
+			y = Vector2(y_raw.r,y_raw.b)
+			x = world_pos_xz-y
+		summed_height += y_raw.g * displacement_scale
+	return summed_height

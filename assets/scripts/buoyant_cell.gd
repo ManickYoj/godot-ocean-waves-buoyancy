@@ -74,7 +74,7 @@ func mass() -> float:
 func apply_force_on_cell(delta: float) -> void:
 	var size = mesh.size
 	var volume: float = size.x * size.y * size.z
-	var depth: float = water.get_wave_height(global_position) - global_position.y
+	var depth: float = water.get_height(global_position) - global_position.y
 	
 	var gravity = ProjectSettings.get_setting("physics/3d/default_gravity_vector") * ProjectSettings.get_setting("physics/3d/default_gravity")
 	#var cube_side_length = pow(volume, 1.0/3.0)
